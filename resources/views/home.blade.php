@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="w-full max-w-8xl p-5 pb-10 mx-auto mb-10 gap-5 columns-5 space-y-5">
+    <div class="w-full max-w-8xl p-5 pb-10 mx-auto mb-10 gap-5 columns-3 space-y-5 mt-16">
         <div class="relative group">
             <img
             src="{{ asset('images/75b89463-49fb-406c-88d9-08b05f7be570.jpeg') }}"

@@ -1,79 +1,70 @@
 @auth
-<header class="bg-white">
-  <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
-    <div class="flex lg:flex-1">
-      <a href="#" class="-m-1.5 p-1.5">
-        <span class="sr-only">Your Company</span>
-        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="">
+<header class="bg-white py-4 fixed top-0 left-0 w-full z-50">
+  <nav class="flex justify-between items-center w-[97%] mx-auto">
+    <div class="flex items-center"> <!-- Grouping div starts here -->
+      <a href="/" class="relative flex items-center inline-block h-5 h-full font-black leading-none">
+        <span class="ml-3 text-xl text-gray-800">Arra<span class="text-pink-500">'s</span></span>
+        <span class="ml-3 text-xl text-gray-800">Gallery<span class="text-pink-500">.</span></span>
       </a>
-    </div>
-    <div class="flex lg:hidden">
-      <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
-        <span class="sr-only">Open main menu</span>
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
-    </div>
-    <div class="hidden lg:flex lg:gap-x-12">
-      <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Features</a>
-      <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Marketplace</a>
-      <a href="#" class="text-sm font-semibold leading-6 text-gray-900">Company</a>
-    </div>
-    <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="mr-3">
-            @csrf
-            <button type="submit" class="text-sm font-semibold leading-6 text-gray-900">Logout</button>
-        </form>
+      
+      <div class="nav-links duration-500 md:static md:w-auto w-full flex items-center px-5">
+        <ul class="flex md:flex-row flex-col md:items-center md:gap-[1vw] gap-8">
+          <li>
+            <a class="home-button {{ Request::is('home*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" href="{{ route('home') }}">Home</a>
+          </li>
+          <li class="relative">
+            <p class="create-button relative cursor-pointer {{ Request::is('gallery/create*') || Request::is('album/create*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" href="#" onclick="toggleCreateDropdown()">Create</p>
+            <div id="createDropdown" class="hidden absolute left-0 mt-6 bg-white border rounded-lg shadow-lg w-48">
+              <a href="{{ route('create.album') }}" class="block px-4 py-2 hover:bg-gray-200 rounded-lg">Buat Album</a>
+              <a href="{{ route('create.foto') }}" class="block px-4 py-2 hover:bg-gray-200 rounded-lg">Unggah Foto</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div> <!-- Grouping div ends here -->
+
+    <div class="flex items-center gap-6">
+      <div class="relative ml-auto"> <!-- Adjusted placement of profile image -->
+        @if(auth()->user()->profile_image_url)
+          <img src="{{ auth()->user()->profile_image_url }}" alt="Profile Image" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfileDropdown()">
+        @else
+          <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-300 text-gray-600 cursor-pointer" onclick="toggleProfileDropdown()">
+            <span>{{ ucfirst(substr(auth()->user()->name, 0, 1)) }}</span>
+          </div>
+        @endif
+        <ul id="profileOptions" class="hidden absolute right-0 mt-4 bg-white border rounded-lg shadow-lg w-48"> <!-- Adjusted width here -->
+          <li><a href="{{ route('profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-lg">Profile</a></li>
+          <li>
+            <form action="{{ route('logout') }}" method="POST">
+              @csrf
+              <button type="submit" class="block w-full px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-lg">Logout</button>
+            </form>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
-  <!-- Mobile menu, show/hide based on menu open state. -->
-  <div class="lg:hidden" role="dialog" aria-modal="true">
-    <!-- Background backdrop, show/hide based on slide-over state. -->
-    <div class="fixed inset-0 z-10"></div>
-    <div class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-      <div class="flex items-center justify-between">
-        <a href="#" class="-m-1.5 p-1.5">
-          <span class="sr-only">Your Company</span>
-          <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="">
-        </a>
-        <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700">
-          <span class="sr-only">Close menu</span>
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      <div class="mt-6 flow-root">
-        <div class="-my-6 divide-y divide-gray-500/10">
-          <div class="space-y-2 py-6">
-            <div class="-mx-3">
-              <button type="button" class="flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50" aria-controls="disclosure-1" aria-expanded="false">
-                Product
-                <!--
-                  Expand/collapse icon, toggle classes based on menu open state.
-
-                  Open: "rotate-180", Closed: ""
-                -->
-                <svg class="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                </svg>
-              </button>
-              <!-- 'Product' sub-menu, show/hide based on menu state. -->
-              <div class="mt-2 space-y-2" id="disclosure-1">
-                <a href="#" class="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-900 hover:bg-gray-50">Analytics</a>
-                <!-- More sub-menu items... -->
-              </div>
-            </div>
-            <a href="#" class="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Features</a>
-            <!-- More menu items... -->
-          </div>
-          <div class="py-6">
-            <a href="#" class="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Log in</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </header>
+
+<script>
+  const navLinks = document.querySelector('.nav-links');
+  const profileOptions = document.getElementById('profileOptions');
+  const mobileLists = document.querySelectorAll('.mobile-list');
+
+  function toggleCreateDropdown() {
+    const createDropdown = document.getElementById('createDropdown');
+    createDropdown.classList.toggle('hidden');
+  }
+
+  function toggleProfileDropdown() {
+    profileOptions.classList.toggle('hidden');
+  }
+
+  // mobileLists.forEach(list => {
+  //   list.addEventListener('click', function() {
+  //     mobileLists.forEach(item => item.classList.remove('active'));
+  //     this.classList.add('active');
+  //   });
+  // });
+</script>
 @endauth

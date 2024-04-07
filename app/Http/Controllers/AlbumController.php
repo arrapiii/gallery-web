@@ -21,7 +21,7 @@ class AlbumController extends Controller
      */
     public function create()
     {
-        //
+        return view('create.createalbum');
     }
 
     /**
