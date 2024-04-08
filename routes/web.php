@@ -21,28 +21,29 @@ use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('mainmenu');
-});
+})->middleware('redirectIfAuthenticated');
 
 Route::get('/signin', function() {
     return view('auth.login');
-});
+})->middleware('autologout');
 
-Route::prefix('gallery')->group(function () {
-    Route::get('/', [FotoController::class, 'index'])->name('gallery');
-    Route::get('/create', [FotoController::class, 'create'])->name('create.foto');
-    Route::get('/upload', [FotoController::class, 'upload'])->name('upload.image');
-});
-
-Route::prefix('album')->group(function() {
-    Route::get('/create', [AlbumController::class, 'create'])->name('create.album');
-});
-
-Route::prefix('profile')->group(function() {
-    Route::get('/', [ProfileController::class, 'index'])->name('profile');
-});
 Auth::routes();
+Route::middleware(['auth'])->group(function() {
+    Route::prefix('gallery')->group(function () {   
+        Route::get('/', [FotoController::class, 'index'])->name('gallery');
+        Route::get('/create', [FotoController::class, 'create'])->name('create.foto');
+        Route::get('/upload', [FotoController::class, 'upload'])->name('upload.image');
+    });
+    
+    Route::prefix('album')->group(function() {
+        Route::get('/', [AlbumController::class, 'index'])->name('album');
+        Route::get('/create', [AlbumController::class, 'create'])->name('create.album');
+    });
+    
+    Route::prefix('profile')->group(function() {
+        Route::get('/', [ProfileController::class, 'index'])->name('profile');
+    });
 
-// Logout route
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+});

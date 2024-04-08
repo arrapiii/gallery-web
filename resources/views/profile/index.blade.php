@@ -22,7 +22,7 @@
 
       <div class="flex justify-center">
         <div class="flex flex-col items-center mx-4">
-            <span class="text-lg font-bold">100</span>
+            <span class="text-lg font-bold">10</span>
             <span class="text-gray-500">Followers</span>
         </div>
         <div class="border-l border-gray-300 h-8"></div>
@@ -44,13 +44,15 @@
   </div>
 
   <div class="grid grid-cols-3 gap-4 mt-8">
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="{{ asset('images/76a39b47-75b4-4804-a717-75c71038f2ba.jpeg') }}" alt="Grid item 1" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <h2 class="text-lg font-semibold">Nama Album 1</h2>
-        <p class="text-gray-500 text-sm">Description for Nama Album 1</p>
-      </div>
-    </div>
+    <a href="{{ route('album') }}">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <img src="{{ asset('images/76a39b47-75b4-4804-a717-75c71038f2ba.jpeg') }}" alt="Grid item 1" class="w-full h-48 object-cover">
+            <div class="p-4">
+              <h2 class="text-lg font-semibold">Nama Album 1</h2>
+              <p class="text-gray-500 text-sm">Description for Nama Album 1</p>
+            </div>
+        </div>
+    </a>
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
       <img src="{{ asset('images/Xd.jpeg') }}" alt="Nama Album 2" class="w-full h-48 object-cover">
       <div class="p-4">
