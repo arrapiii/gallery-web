@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Foto;
 
 use Illuminate\Http\Request;
 
@@ -23,6 +24,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $fotos = Foto::all();
+
+        return view('main.home', ['fotos' => $fotos]);
     }
+
+ 
 }

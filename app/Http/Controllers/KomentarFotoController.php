@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\KomentarFoto;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use App\Http\Controllers\Controller;
 
 class KomentarFotoController extends Controller
 {
@@ -29,7 +30,26 @@ class KomentarFotoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the comment data
+        $validatedData = $request->validate([
+            'foto_id' => 'required|exists:fotos,id',
+            'isi_komentar' => 'required',
+        ]);
+    
+        // Create a new comment
+        $comment = new KomentarFoto();
+        $comment->foto_id = $validatedData['foto_id'];
+        $comment->user_id = auth()->id();
+        $comment->isi_komentar = $validatedData['isi_komentar'];
+        $comment->save();
+    
+        $comment->created_at_formatted = Carbon::parse($comment->created_at)->diffForHumans();
+        // Return the comment data as JSON
+        return response()->json([
+            'success' => true,
+            'comment' => $comment,
+            'created_at_formatted' => $comment->created_at_formatted
+        ]);
     }
 
     /**
