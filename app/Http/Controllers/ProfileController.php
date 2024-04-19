@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Foto;
+use App\Models\User;
 use App\Models\Album;
 use Laravel\Ui\Presets\Vue;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
@@ -23,5 +25,52 @@ class ProfileController extends Controller
         })->sum();
   
         return view('profile.index', ['albums' => $albums, 'totalLikes' => $totalLikes]);
+    }
+
+    public function viewProfile($userId)
+    {
+        // Find the user by their ID
+        $user = User::findOrFail($userId);
+
+        // Retrieve albums and other profile information for the user
+        $albums = $user->albums()->with('photos')->get();
+
+        $totalLikes = $user->photos->flatMap(function ($photo) {
+            return $photo->likes;
+        })->count();
+
+        return view('profile.view', ['user' => $user, 'albums' => $albums, 'totalLikes' => $totalLikes]);
+    }
+
+    public function edit()
+    {
+        $user = auth()->user();
+        return view('profile.edit', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+
+        // Validate the form data
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            // Add more validation rules as needed
+        ]);
+
+        // If validation fails, redirect back with errors
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Update the user's profile information
+        $user->name = $request->name;
+        $user->email = $request->email;
+        // Update other fields as needed
+        $user->save();
+
+        // Redirect back to the profile page with a success message
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
     }
 }

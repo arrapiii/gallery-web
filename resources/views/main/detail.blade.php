@@ -65,7 +65,9 @@
                  <!-- Profile, followers, and follow button -->
                  <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center">
-                        <img src="{{ asset('storage/' . $foto->user->avatar) }}" alt="Profile Photo" class="w-12 h-12 rounded-full mr-2">
+                        <a href="{{ route('profile.show', ['userId' => $foto->user]) }}" class="mr-2">
+                            <img src="{{ asset('storage/' . $foto->user->avatar) }}" alt="Profile Photo" class="w-12 h-12 rounded-full">
+                        </a>
                         <div class="flex flex-col">
                             <div class="text-gray-800 font-bold">{{ $foto->user->name }}</div>
                             <div class="text-gray-500 text-sm">{{ $foto->user->photos()->count() }} Post</div>
@@ -83,6 +85,9 @@
                         @foreach($foto->comments as $comment)
                             <div class="w-full mb-4">
                                 <div class="flex items-start">
+                                    <a href="{{ route('profile.show', ['userId' => $comment->user->id]) }}" class="mr-2">
+                                        <img src="{{ asset('storage/' . $comment->user->avatar) }}" alt="Profile Photo" class="w-12 h-12 rounded-full mr-4">
+                                    </a>
                                     <img src="{{ asset('storage/' . $comment->user->avatar) }}" alt="Profile Photo" class="w-12 h-12 rounded-full mr-4">
                                     <div class="flex-grow">
                                         <div class="flex justify-between">
@@ -240,6 +245,7 @@
                     
                     // Check if there are comments
                     if (response.comments.length > 0) {
+                        var allUserIds = [];
                         // Loop through each comment in the response
                         response.comments.forEach(function(comment) {
                     
@@ -247,7 +253,9 @@
                             // Construct HTML for each comment
                             var commentHtml = `
                                 <div class="comment flex items-start mb-4">
-                                    <img src="{{ asset('storage/') }}/${comment.user.avatar}" alt="Profile Photo" class="w-12 h-12 rounded-full mr-4">
+                                    <a href="/profile/${comment.user.id}" class="mr-2">
+                                        <img src="{{ asset('storage/') }}/${comment.user.avatar}" alt="Profile Photo" class="w-12 h-12 rounded-full mr-4">
+                                    </a>
                                     <div class="flex-grow">
                                         <div class="flex justify-between">
                                             <strong>${comment.user.name}</strong>
@@ -256,14 +264,16 @@
                                         <p>${comment.isi_komentar}</p>
                                     </div>
                                 </div>
-                                <hr class="my-4"> <!-- Divider line -->
+                                <hr class="my-4">
                             `;
                             
                             // Append the comment HTML to the comments section
                             $('#commentsSection').append(commentHtml);
+                            allUserIds.push(comment.user.id);
                         });
                         // Update comment count
                         $('#commentCount').text(response.comments.length);
+                        console.log('All user IDs:', allUserIds);
                     } else {
                         // If there are no comments, display a message
                         $('#commentsSection').html('<p>No comments available.</p>');

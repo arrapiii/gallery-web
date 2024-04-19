@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Album;
+use App\Models\LikeFoto;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -44,15 +45,23 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
     {
         $this->rowCount++;
 
-        // Get the image URL
         $imageUrl = Storage::url($photo->lokasi_file);
+        $likeCount = $photo->likes->count();
+        
+        $likeCount = $likeCount ?? 'Zero';
 
+        date_default_timezone_set('Asia/Jakarta');
+        
+        $createdAt = Carbon::parse($photo->created_at)->locale('id_ID')->format('d F Y H:i:s');
+        $updatedAt = Carbon::parse($photo->updated_at)->locale('id_ID')->format('d F Y H:i:s');
+        
         return [
-            $this->rowCount, // ID starts from 1 and increments
+            $this->rowCount,
             $photo->judul_foto,
             $photo->deskripsi_foto,
-            $photo->created_at->toDateTimeString(),
-            $photo->updated_at->toDateTimeString(),
+            $likeCount,
+            $createdAt,
+            $updatedAt,
             ''
         ];
     }
@@ -73,17 +82,14 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
                 $drawing->setDescription($photo->judul_foto);
                 $drawing->setPath($imageUrl);
 
-                $drawing->setHeight(200); // Adjust image height as needed
-                $drawing->setWidth(200); // Adjust image height as needed
+                $drawing->setHeight(200);
+                $drawing->setWidth(200);
 
-                // Set cell coordinates for the image (adjust column letter if needed)
-                $drawing->setCoordinates('G' . $imageRow);
+                $drawing->setCoordinates('H' . $imageRow);
 
-                 // Set alignment to center the image
                 $drawing->setOffsetX(0);
                 $drawing->setOffsetY(0);
 
-                // Add the drawing object to the $drawings array
                 $drawings[] = $drawing;
 
                 // Increment image row for subsequent images
@@ -97,102 +103,103 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
 
     public function startCell(): string
     {
-        return 'B2'; // Set the start cell to B2
+        return 'B2';
     }
 
     public function headings(): array
     {
         $album = Album::findOrFail($this->albumId);
 
-        // Format the date
         $formattedDate = strtoupper(Carbon::now()->isoFormat('DD MMMM YYYY'));
 
-        // Create the headings array
         return [
-            [$album->nama_album], // Album name
-            [$formattedDate], // Current date
-            ['ID', 'Title', 'Description', 'Created At', 'Updated At', 'Image'], // Column headings for photos
+            [$album->nama_album],
+            [$formattedDate],
+            ['ID', 'Title', 'Description', 'Jumlah Like', 'Created At', 'Updated At', 'Image'],
         ];
     }
 
     public function columnWidths(): array
     {
         return [
-            'B' => 10, // Custom width for column B
-            'C' => 20, // Custom width for column C
-            'D' => 30, // Custom width for column D
-            'E' => 20, // Custom width for column E
-            'F' => 20, // Custom width for column F
-            'G' => 50, // Custom width for column G (for images)
+            'B' => 10,
+            'C' => 20,
+            'D' => 30,
+            'E' => 15,
+            'F' => 20, 
+            'G' => 20,
+            'H' => 50, 
         ];
     }
 
     public function styles(Worksheet $sheet)
-{
-    
-    // Determine the last row of the data collection
-    $lastRow = $this->rowCount + 4; // Add 3 to account for the header rows
-    // Set the header background color to blue and apply border
-    $sheet->getStyle('B2:G4')->applyFromArray([
-        'fill' => [
-            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-            'color' => ['rgb' => 'c2d9ff'],
-        ],
-        'borders' => [
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_MEDIUM,
-                'color' => ['rgb' => '000000'],
+    {
+        
+        // Determine the last row of the data collection
+        $lastRow = $this->rowCount + 4; // Add 3 to account for the header rows
+        // Set the header background color to blue and apply border
+        $sheet->getStyle('B2:H4')->applyFromArray([
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'color' => ['rgb' => 'c2d9ff'],
             ],
-        ],
-        'font' => [
-            'bold' => true,
-        ],
-        'alignment' => [
-            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-        ],
-    ]);
-
-     // Apply styling from B5 to the last row of the data collection
-     $sheet->getStyle('B5:G' . $lastRow)->applyFromArray([
-        'fill' => [
-            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-        ],
-        'borders' => [
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_MEDIUM,
-                'color' => ['rgb' => '000000'],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_MEDIUM,
+                    'color' => ['rgb' => '000000'],
+                ],
             ],
-        ],
-        'alignment' => [
-            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-        ],
-    ]);
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ]);
 
-    // Iterate over drawings and adjust row heights
-    foreach ($this->drawings() as $drawing) {
-        $rowHeight = $drawing->getHeight() + 10; // Add some padding around the image
-        $sheet->getRowDimension($drawing->getCoordinates()[1])->setRowHeight($rowHeight);
+        // Apply styling from B5 to the last row of the data collection
+        $sheet->getStyle('B5:H' . $lastRow)->applyFromArray([
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_MEDIUM,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        // Iterate over drawings and adjust row heights
+        foreach ($this->drawings() as $drawing) {
+            $rowHeight = $drawing->getHeight() + 10; // Add some padding around the image
+            $sheet->getRowDimension($drawing->getCoordinates()[1])->setRowHeight($rowHeight);
+        }
+
+        // Center image drawings
+        foreach ($this->drawings() as $drawing) {
+            $column = $drawing->getCoordinates()[0]; // Get the column of the drawing
+            $columnWidth = $sheet->getColumnDimension($column)->getWidth(); // Get the width of the column
+            $drawingWidth = $drawing->getWidth(); // Get the width of the drawing
+            $offsetX = ($columnWidth - $drawingWidth) / 2; // Calculate the horizontal offset
+            $drawing->setOffsetX($offsetX); // Set the horizontal offset to center the drawing
+        }
+
+
+        // Merge cells for rows 2 and 3 as benchmark merge cells from row 4
+        $sheet->mergeCells('B2:H2');
+        $sheet->mergeCells('B3:H3');
+
+        // Set the alignment for the rest of the cells to center
+        $sheet->getStyle('A5:H' . ($this->rowCount + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A5:H' . ($this->rowCount + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+        $sheet->getStyle('B2:H' . $lastRow)->getAlignment()->setWrapText(true);
     }
-
-    // Center image drawings
-    foreach ($this->drawings() as $drawing) {
-        $column = $drawing->getCoordinates()[0]; // Get the column of the drawing
-        $columnWidth = $sheet->getColumnDimension($column)->getWidth(); // Get the width of the column
-        $drawingWidth = $drawing->getWidth(); // Get the width of the drawing
-        $offsetX = ($columnWidth - $drawingWidth) / 2; // Calculate the horizontal offset
-        $drawing->setOffsetX($offsetX); // Set the horizontal offset to center the drawing
-    }
-
-
-    // Merge cells for rows 2 and 3 as benchmark merge cells from row 4
-    $sheet->mergeCells('B2:G2');
-    $sheet->mergeCells('B3:G3');
-
-    // Set the alignment for the rest of the cells to center
-    $sheet->getStyle('A5:G' . ($this->rowCount + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-    $sheet->getStyle('A5:G' . ($this->rowCount + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-}
 
 }

@@ -66,6 +66,9 @@ Route::middleware(['auth'])->group(function() {
     
     Route::prefix('profile')->group(function() {
         Route::get('/', [ProfileController::class, 'index'])->name('profile');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/{userId}', [ProfileController::class, 'viewProfile'])->name('profile.show');
         Route::get('/albums/{id}', [AlbumController::class, 'show'])->name('album.show');
     });
 

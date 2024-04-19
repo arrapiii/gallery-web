@@ -196,29 +196,29 @@ class FotoController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Foto $foto)
-{
-    // Validate the form data
-    $validator = Validator::make($request->all(), [
-        'album_id' => 'nullable|exists:albums,id',
-        'judul_foto' => 'required',
-        'deskripsi_foto' => 'required',
-    ]);
+    {
+        // Validate the form data
+        $validator = Validator::make($request->all(), [
+            'album_id' => 'nullable|exists:albums,id',
+            'judul_foto' => 'required',
+            'deskripsi_foto' => 'required',
+        ]);
 
-    // If validation fails, return the error response
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
+        // If validation fails, return the error response
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Update the photo data
+        $foto->update([
+            'album_id' => $request->input('album_id'), // Ensure album_id is passed as a single integer value
+            'judul_foto' => $request->input('judul_foto'),
+            'deskripsi_foto' => $request->input('deskripsi_foto'),
+        ]);
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Photo updated successfully.');
     }
-
-    // Update the photo data
-    $foto->update([
-        'album_id' => $request->input('album_id'), // Ensure album_id is passed as a single integer value
-        'judul_foto' => $request->input('judul_foto'),
-        'deskripsi_foto' => $request->input('deskripsi_foto'),
-    ]);
-
-    // Redirect back with a success message
-    return redirect()->back()->with('success', 'Photo updated successfully.');
-}
 
 
     /**
