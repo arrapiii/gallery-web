@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Exports\AlbumExport;
 use Illuminate\Http\Request;
+use App\Models\AktivitasUser;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Session;
@@ -41,6 +42,12 @@ class AlbumController extends Controller
             'nama_album' => $validated['nama_album'],
             'deskripsi' => $validated['deskripsi'],
             'user_id' => auth()->id(),
+        ]);
+
+        // Log the activity
+        AktivitasUser::create([
+            'user_id' => auth()->id(),
+            'aktivitas' => 'Telah membuat album',
         ]);
 
         Session::flash('success', 'Album created successfully.');

@@ -1,6 +1,6 @@
 @auth
     @if (!request()->is('avatar*')) <!-- Check if the current route is not related to the avatar -->
-    <header class="bg-white py-4 fixed top-0 left-0 w-full z-50">
+    <header class="bg-white py-4 fixed top-0 left-0 w-full z-50" style="min-width: 800px">
         <nav class="flex justify-between items-center w-[97%] mx-auto">
           <header class="bg-white py-4 fixed top-0 left-0 w-full z-50">
             <nav class="flex justify-between items-center w-[97%] mx-auto">
@@ -10,8 +10,8 @@
                   <span class="ml-3 text-xl text-gray-800">Gallery<span class="text-pink-500">.</span></span>
                 </a>
                 
-                <div class="nav-links duration-500 md:w-auto w-full flex items-center px-5">
-                  <ul class="flex md:flex-row flex-col md:items-center md:gap-[1vw] gap-8">
+                <div class="nav-links duration-500 md:w-auto w-full flex items-center px-5" style="display: flex; flex-wrap: wrap">
+                  <ul class="flex md:flex-row flex-col md:items-center md:gap-[1vw] gap-8" style="flex-direction: row">
                     <li>
                       <a class="home-button {{ Request::is('home*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" href="{{ route('home') }}">Home</a>
                     </li>
@@ -25,8 +25,14 @@
                   </ul>
                 </div>
               </div> <!-- Grouping div ends here -->
-          
-              <div class="flex items-center gap-6">
+
+              <!-- Search bar -->
+              <form id="searchForm" action="{{ route('search.results') }}" method="GET" class="relative flex-grow">
+                <input id="searchInput" name="query" type="text" placeholder="Search..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500">
+              </form>
+
+ 
+              <div class="pl-6 flex items-center gap-6">
                 <div class="relative ml-auto">
                   @if(auth()->user()->avatar)
                       <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Profile Image" class="w-10 h-10 rounded-full cursor-pointer" onclick="toggleProfileDropdown()">
@@ -73,5 +79,31 @@
       this.classList.add('active');
     });
   });
+
+  $(document).ready(function() {
+    $('#search-form').submit(function(event) {
+        event.preventDefault();
+
+        var query = $('#query').val();
+        var name = $('#name').val();
+
+        $.ajax({
+            url: '{{ route('search.results') }}',
+            method: 'GET',
+            data: {
+                query: query,
+                name: name
+            },
+            success: function(response) {
+                $('.gallery').html(response);
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    });
+});
+
+
 </script>
 @endauth

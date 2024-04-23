@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Foto;
 use App\Models\Album;
 use App\Models\LikeFoto;
+use App\Models\LaporanFoto;
 use Illuminate\Support\Str;
+use App\Models\JenisLaporan;
 use Illuminate\Http\Request;
+use App\Models\AktivitasUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -52,8 +55,11 @@ class FotoController extends Controller
 
         $likeCount = $this->getLikeCount($photoId);
 
+        $jenisLaporans = JenisLaporan::all();
+        
+
         // Pass the photo data to the detail view
-        return view('main.detail', compact('foto', 'likeCount'));
+        return view('main.detail', compact('foto', 'likeCount', 'jenisLaporans'));
     }
 
      /**
@@ -70,9 +76,21 @@ class FotoController extends Controller
             ->where('user_id', Auth::id())
             ->first();
 
+        // Get the name of the user whose post is being liked or unliked
+        $userWhosePostIsLikedOrDisliked = $foto->user->name;
+
+        $lokasiFoto = $foto->lokasi_file;
+
         // If the user has already liked the photo, do nothing
         if ($existingLike) {
             return response()->json(['message' => 'You have already liked this photo.']);
+
+            // Log the activity for unliking
+            AktivitasUser::create([
+                'user_id' => Auth::id(),
+                'aktivitas' => "Unlike postingan milik $userWhosePostIsLikedOrDisliked",
+                'foto' => $lokasiFoto,
+            ]);
         }
 
         // Create a new like record
@@ -80,6 +98,15 @@ class FotoController extends Controller
         $like->foto_id = $foto->id;
         $like->user_id = Auth::id();
         $like->save();
+
+        // Log the activity for unliking
+            $aktivitas = $existingLike ? 'Membatalkan menyukai' : 'Menyukai';
+            AktivitasUser::create([
+                'user_id' => Auth::id(),
+                'aktivitas' => "$aktivitas postingan milik $userWhosePostIsLikedOrDisliked",
+                'foto' => $lokasiFoto,
+            ]);
+
 
         return response()->json(['message' => 'Photo liked successfully.']);
     }
@@ -101,6 +128,18 @@ class FotoController extends Controller
         // If the like record exists, delete it
         if ($like) {
             $like->delete();
+
+            // Get the name of the user whose post is being unliked
+            $userWhosePostIsLikedOrDisliked = $foto->user->name;
+            $lokasiFoto = $foto->lokasi_file;
+
+            // Log the activity for unliking
+            AktivitasUser::create([
+                'user_id' => Auth::id(),
+                'aktivitas' => "Unlike postingan milik $userWhosePostIsLikedOrDisliked",
+                'foto' => $lokasiFoto,
+            ]);
+
             return response()->json(['message' => 'Photo unliked successfully.']);
         }
 
@@ -165,6 +204,37 @@ class FotoController extends Controller
         return redirect()->back();
     }
 
+    public function report(Request $request)
+    {
+        // Validate the request data
+        $validatedData = $request->validate([
+            'foto_id' => 'required|exists:fotos,id',
+            'jenis_laporan_id' => 'required|exists:jenis_laporans,id',
+        ]);
+
+        // Check if the user has already reported this photo with a pending status
+        $existingReport = LaporanFoto::where('foto_id', $validatedData['foto_id'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingReport) {
+
+            return response()->json(['message' => 'You have already reported this photo with status pending'], 400);
+        }
+
+        // Create a new report instance
+        $report = new LaporanFoto();
+        $report->foto_id = $validatedData['foto_id'];
+        $report->user_id = auth()->id();
+        $report->jenis_laporan_id = $validatedData['jenis_laporan_id'];
+        $report->status = 'pending'; // Set the status to pending
+        $report->save();
+
+        // Optionally, you can return a response indicating success
+        return response()->json(['message' => 'Report submitted successfully'], 200);
+    }
+
     public function comments(Foto $foto)
     {
         $comments = $foto->comments()->with('user')->get();
@@ -173,6 +243,37 @@ class FotoController extends Controller
             'comments' => $comments,
         ]);
     }
+
+    // Controller method responsible for handling search functionality
+    public function search(Request $request)
+    {
+        // Retrieve the search query and username from the request
+        $query = $request->query('query');
+        $name = $request->query('name');
+
+        // Perform the search based on the query and name
+        $results = Foto::query()
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where('judul_foto', 'like', "%{$query}%")
+                            ->orWhere('deskripsi_foto', 'like', "%{$query}%");
+            })
+            ->when($name, function ($queryBuilder) use ($name) {
+                $queryBuilder->whereHas('user', function ($userQuery) use ($name) {
+                    $userQuery->where('name', 'like', "%{$name}%");
+                });
+            })
+            ->get();
+
+            AktivitasUser::create([
+                'user_id' => Auth::id(),
+                'aktivitas' => "Melakukan Pencarian '{$query}'",
+            ]);
+
+        // Pass the search results to the view
+        return view('main.searchresult', ['results' => $results]);
+    }
+
+
 
     /**
      * Display the specified resource.

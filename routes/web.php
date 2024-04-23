@@ -1,14 +1,15 @@
 <?php
 
-use App\Http\Controllers\AlbumController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\AvatarController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FotoController;
-use App\Http\Controllers\KomentarFotoController;
-use App\Http\Controllers\MainMenuController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MainMenuController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\KomentarFotoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,12 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     });
 
+    Route::prefix('admin')->middleware('admin')->group(function() {
+        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+        Route::post('/approve-photo', [AdminController::class, 'approvePhoto'])->name('photo.approve');
+        Route::post('/reject-photo', [AdminController::class, 'rejectPhoto'])->name('photo.reject');
+    });
+
     Route::prefix('gallery')->group(function () {
         Route::get('/', [FotoController::class, 'index'])->name('gallery');
         Route::get('/detail', [FotoController::class, 'detail'])->name('detail');
@@ -54,6 +61,8 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/photos/{foto}/edit', [FotoController::class, 'edit'])->name('edit.foto');
         Route::put('/photos/{foto}/update', [FotoController::class, 'update'])->name('update.foto');
         Route::delete('/photos/{foto}/destroy', [FotoController::class, 'destroy'])->name('delete.foto');
+        Route::get('/search', [FotoController::class, 'search'])->name('search.results');
+        Route::post('/report', [FotoController::class, 'report'])->name('report.store');
     });
     
     Route::prefix('album')->group(function() {
@@ -70,6 +79,7 @@ Route::middleware(['auth'])->group(function() {
         Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
         Route::get('/{userId}', [ProfileController::class, 'viewProfile'])->name('profile.show');
         Route::get('/albums/{id}', [AlbumController::class, 'show'])->name('album.show');
+        Route::post('/export-activity-logs', [ProfileController::class, 'export'])->name('export.activity.logs');
     });
 
     Route::prefix('comment')->group(function() {

@@ -1,9 +1,9 @@
     @extends('layouts.master')
 
     @section('content')
-    <div class="container mx-auto px-4 mt-48">
-        <div class="max-w-xl mx-auto bg-white shadow-md rounded-md p-8">
-            <h1 class="text-2xl font-semibold mb-4">Welcome to Our Website!</h1>
+    <div class="container mx-auto px-4 mt-28">
+        <div class="max-w-2xl mx-auto bg-white shadow-md rounded-md p-8">
+            <h1 class="text-2xl font-semibold mb-4">Selamat Datang di Website Galeri!!</h1>
             <!-- Display Toastr success message after uploading avatar -->
             @if(session('success'))
                 <script>
@@ -11,14 +11,15 @@
                 </script>
             @endif
 
-            <p class="mb-4">To personalize your experience, you can add an avatar:</p>
-            <label for="avatarInput" class="relative w-24 h-24 rounded-full flex items-center justify-center bg-gray-300 text-gray-600 cursor-pointer mx-auto mb-4">
+            <p class="mb-4">Untuk mempersonalisasi pengalaman Anda, Anda dapat menambahkan avatar.</p>
+            <p class="mb-4">Klik Lingkaran di Bawah untuk menambahkan avatar.</p>
+            <label for="avatarInput" class="relative w-80 h-80 rounded-full flex items-center justify-center bg-gray-300 text-gray-600 cursor-pointer mx-auto mb-4">
                 @if (auth()->user()->avatar)
                     <!-- Display the user's avatar if it exists -->
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-full h-full rounded-full">
                 @else
                     <!-- Display the first letter of the user's name if no avatar -->
-                    <span class="text-3xl font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                    <span class="text-9xl font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                 @endif
             </label>
 
@@ -70,6 +71,11 @@
             document.getElementById('uploadButton').classList.remove('hidden');
             toastr.info('Press the "Upload Avatar" button to apply the image.');
         });
+
+        function showCenteredToastr(message, type) {
+            toastr.options.positionClass = 'toast-center-center'; // Set position to center
+            toastr[type](message);
+        }
 
         // Display success message after uploading or removing avatar
         @if(session('success'))

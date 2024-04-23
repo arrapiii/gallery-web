@@ -9,7 +9,7 @@
     <title>Create Page</title>
     <link rel="stylesheet" href="{{ asset('dist/css/app.css') }}" />
 </head>
-<body class="bg-gray-100 mt-28">
+<body class="mt-28">
     <div class="container mx-auto px-4 mt-18">
         <div class="max-w-xl mx-auto bg-white shadow-md rounded-md p-8">
             <h1 class="text-2xl font-semibold mb-4">Change ur avatar!</h1>
@@ -93,11 +93,10 @@
 
     <!-- Back Button -->
     <div class="fixed top-24 left-4">
-        <a href="{{ route('profile') }}" class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600">
+        <a href="javascript:history.back()" class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600">
             <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Back
         </a>
     </div>
     

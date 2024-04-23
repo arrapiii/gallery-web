@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
+use App\Models\AktivitasUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -35,5 +37,20 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        // Create a new activity log for user login
+        AktivitasUser::create([
+            'user_id' => $user->id,
+            'aktivitas' => 'Melakukan Login',
+        ]);
+        
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.index');
+        } else {
+            return redirect()->route('home');
+        }
     }
 }

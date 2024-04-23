@@ -78,7 +78,7 @@
 <div class="bg-gray-100 flex justify-center items-center h-screen">
     <!-- Left: Image -->
 <div class="w-1/2 h-screen hidden lg:block">
-  <img src="https://placehold.co/800x/667fff/ffffff.png?text=Your+Image&font=Montserrat" alt="Placeholder Image" class="object-cover w-full h-full">
+  <img src="{{ asset('images/logo.jpeg') }}" alt="Placeholder Image" class="object-cover w-full h-full">
 </div>
 <!-- Right: Login Form -->
 <div class="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2">
@@ -104,18 +104,18 @@
           @enderror
       </div>
 
-      <!-- Remember Me Checkbox -->
+      {{-- <!-- Remember Me Checkbox -->
       <div class="mb-4 flex items-center">
           <input type="checkbox" id="remember" name="remember" class="text-blue-500">
           <label for="remember" class="text-gray-600 ml-2">Remember Me</label>
-      </div>
+      </div> --}}
 
-      <!-- Forgot Password Link -->
+      {{-- <!-- Forgot Password Link -->
       <div class="mb-6 text-blue-500">
           @if (Route::has('password.request'))
           <a href="{{ route('password.request') }}" class="hover:underline">Forgot Password?</a>
           @endif
-      </div>
+      </div> --}}
 
       <!-- Login Button -->
       <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Login</button>

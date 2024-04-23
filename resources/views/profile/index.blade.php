@@ -2,6 +2,21 @@
 
 @section('content')
 <div class="bg-white p-6 rounded-lg shadow-md mt-20">
+  <div class="flex justify-end mx-5 mb-4">
+    <form action="{{ route('export.activity.logs') }}" method="POST">
+      @csrf
+      <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-6">
+        Report Log Activity
+    </button>
+    </form>
+    <form action="{{ route('profile.edit') }}" method="POST">
+      @csrf
+      <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Edit Profil
+    </button>
+    </form>
+  </div>
+
   <div class="flex flex-col items-center">
     @auth
       <div class="mb-8">
@@ -18,9 +33,7 @@
     <div class="flex flex-col items-center justify-center">
       @auth
         <h2 class="text-3xl font-semibold mb-4">{{ auth()->user()->name }}</h2>
-        <a href="{{ route('profile.edit') }}" class="text-blue-500 hover:text-blue-600 mb-2">Edit Profile</a>
-      @endauth
-
+        @endauth
       <div class="flex justify-center">
         <div class="flex flex-col items-center mx-8">
             <span class="text-lg font-bold">{{ auth()->user()->photos()->count() }}</span>
@@ -46,26 +59,52 @@
 
   <div class="grid grid-cols-3 gap-4 mt-8">
     @if($albums->isEmpty())
-      <div class="col-span-3 flex justify-center">
-        <p>You don't have an album.</p>
-      </div>
+        <div class="col-span-3 flex justify-center">
+            <p>You don't have any albums.</p>
+        </div>
     @else
-        @foreach($albums as $album)
-            <a href="{{ route('album.show', $album->id) }}">
+        @foreach($albums as $index => $album)
+            @php
+                $coverPhoto = $album->photos()->latest()->first();
+                $photoCount = $album->photos()->count();
+            @endphp
+            <a href="{{ route('album.show', $album->id) }}" class="relative">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    @php
-                        $coverPhoto = $album->photos()->latest()->first();
-                    @endphp
                     <img src="{{ $coverPhoto ? asset('storage/' . $coverPhoto->lokasi_file) : asset('images/no_photo.jpg') }}" alt="Album Cover" class="w-full h-48 object-cover">
                     <div class="p-4">
                         <h2 class="text-lg font-semibold">{{ $album->nama_album }}</h2>
                         <p class="text-gray-500 text-sm">{{ $album->deskripsi }}</p>
                     </div>
                 </div>
+                <!-- Display photo count -->
+                <div class="absolute bottom-2 right-2 bg-white rounded-md shadow-md px-2 py-1 text-xs text-gray-500">{{ $photoCount }} photos</div>
+            </a>
+            <!-- Break the loop after the first album -->
+            @if($index == 0)
+                @break
+            @endif
+        @endforeach
+        <!-- Display remaining albums -->
+        @foreach($albums->slice(1) as $album)
+            @php
+                $coverPhoto = $album->photos()->latest()->first();
+                $photoCount = $album->photos()->count();
+            @endphp
+            <a href="{{ route('album.show', $album->id) }}" class="relative">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="{{ $coverPhoto ? asset('storage/' . $coverPhoto->lokasi_file) : asset('images/no_photo.jpg') }}" alt="Album Cover" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h2 class="text-lg font-semibold">{{ $album->nama_album }}</h2>
+                        <p class="text-gray-500 text-sm">{{ $album->deskripsi }}</p>
+                    </div>
+                </div>
+                <!-- Display photo count -->
+                <div class="absolute bottom-2 right-2 bg-white rounded-md shadow-md px-2 py-1 text-xs text-gray-500">{{ $photoCount }} photos</div>
             </a>
         @endforeach
     @endif
-  </div>
+</div>
+
 
 
 </div>

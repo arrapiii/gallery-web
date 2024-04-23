@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Models\Album;
 use Laravel\Ui\Presets\Vue;
 use Illuminate\Http\Request;
+use App\Models\AktivitasUser;
+use App\Exports\AktivitasUserExport;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
@@ -72,5 +75,17 @@ class ProfileController extends Controller
 
         // Redirect back to the profile page with a success message
         return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
+    }
+
+    public function export()
+    {
+        // Get the authenticated user's ID
+        $userId = auth()->id();
+
+        // Fetch the aktivitas data for the authenticated user
+        $aktivitas = AktivitasUser::where('user_id', $userId)->get();
+
+        // Generate the Excel export
+        return Excel::download(new AktivitasUserExport($aktivitas), 'aktivitas_user.xlsx');
     }
 }

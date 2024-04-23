@@ -23,7 +23,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 mt-28">
+<body class="mt-28">
     @include('layouts.header')
     
     <form id="photo-upload-form" action="{{ route('store.foto') }}" method="POST" enctype="multipart/form-data">
@@ -61,14 +61,15 @@
                     <h2 class="text-xl font-semibold mb-4">Keterangan Foto</h2>
                     @if($albums->isEmpty())
                         <!-- Display this select if the user doesn't have any albums -->
-                        <label for="album_id" class="form-label">Pilih Album (Optional)</label>
+                        <label for="album_id" class="form-label">Pilih Album</label>
                         <select id="album_id" name="album_id[]" data-placeholder="" class="tom-select w-full" disabled> 
                             <option value="Kamu Belum Punya Album, buatlah dahulu di Header Create">Kamu Belum Punya Album, buatlah dahulu di Header Create</option>
                         </select> 
+                        <a class="form-help cursor-pointer text-blue-500" onclick="showCreateAlbumAlert()">Tap di sini untuk pindah ke form album dengan mudah</a>
                     @else
                         <!-- Display this select if the user has albums -->
-                        <label for="album_id" class="form-label">Pilih Album (Optional)</label>
-                        <select id="album_id" name="album_id[]" data-placeholder="Pilih Album" class="tom-select w-full"> 
+                        <label for="album_id" class="form-label">Pilih Album</label>
+                        <select id="album_idelse" name="album_id[]" data-placeholder="Pilih Album" class="tom-select w-full"> 
                             @foreach ($albums as $album)
                                 <option value=""></option>
                                 <option value="{{ $album->id }}">{{ $album->nama_album }}</option>
@@ -136,10 +137,11 @@
         function validateForm() {
             const judulFoto = document.getElementById('judul_foto').value;
             const deskripsiFoto = document.getElementById('deskripsi_foto').value;
+            const albumFoto = document.getElementById('album_idelse');
             // Add more fields for validation as needed
 
             // Check if any of the required fields are empty
-            if (!judulFoto || !deskripsiFoto) {
+            if (!judulFoto || !deskripsiFoto || !albumFoto) {
                 return false;
             }
             return true;

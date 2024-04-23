@@ -22,8 +22,27 @@
      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     
 
     <title>Arra's Gallery</title>
+    <style>
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+            }
+
+            /* Track */
+            ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey;
+            border-radius: 10px;
+            }
+
+            /* Handle */
+            ::-webkit-scrollbar-thumb {
+            background: #175a72;
+            border-radius: 10px;
+            }
+    </style>
     @stack('styles')
 </head>
 <body class="bg-gray-100">

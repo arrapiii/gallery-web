@@ -3,9 +3,7 @@
 @section('content')
 <div class="w-full mx-auto px-12">
     <div class="bg-white rounded-lg shadow-md p-5 mt-40">
-        <div class="text-center mb-4"> <!-- Center the album name text -->
-            <h2 class="text-3xl font-semibold">{{ $album->nama_album }}</h2>
-            @if(auth()->user() && auth()->user()->id === $album->user_id)
+        @if(auth()->user() && auth()->user()->id === $album->user_id)
                 <form action="{{ route('export.album', $album->id) }}" method="post" class="mt-2">
                     @csrf
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md">
@@ -13,6 +11,8 @@
                     </button>
                 </form>
             @endif
+        <div class="text-center mb-4"> <!-- Center the album name text -->
+            <h2 class="text-3xl font-semibold">{{ $album->nama_album }}</h2>
         </div>
         @if ($fotos->isEmpty())
             <p class="text-center text-gray-500">This album does not have any photos.</p>
@@ -47,7 +47,6 @@
         <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        Back
     </a>
 </div>
 @endsection
