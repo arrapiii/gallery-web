@@ -16,7 +16,7 @@
                       <a class="home-button {{ Request::is('home*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" href="{{ route('home') }}">Home</a>
                     </li>
                     <li class="relative">
-                      <p class="create-button relative cursor-pointer {{ Request::is('gallery/create*') || Request::is('album/create*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" onclick="toggleCreateDropdown()">Create</p>
+                      <p class="create-button relative cursor-pointer {{ Request::is('gallery/create*') || Request::is('album/create*') ? 'bg-blue-500 text-white rounded-md px-4 py-2' : '' }} mobile-list" onclick="toggleCreateDropdown()">Unggah</p>
                       <div id="createDropdown" class="hidden absolute left-0 mt-6 bg-white border rounded-lg shadow-lg w-48">
                         <a href="{{ route('create.album') }}" class="block px-4 py-2 hover:bg-gray-200 rounded-lg">Buat Album</a>
                         <a href="{{ route('create.foto') }}" class="block px-4 py-2 hover:bg-gray-200 rounded-lg">Unggah Foto</a>

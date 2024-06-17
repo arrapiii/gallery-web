@@ -244,36 +244,36 @@ class FotoController extends Controller
         ]);
     }
 
-    // Controller method responsible for handling search functionality
     public function search(Request $request)
     {
-        // Retrieve the search query and username from the request
+        // Retrieve the search query and album name from the request
         $query = $request->query('query');
-        $name = $request->query('name');
-
-        // Perform the search based on the query and name
+        $namaAlbum = $request->query('nama_album');
+    
         $results = Foto::query()
-            ->when($query, function ($queryBuilder) use ($query) {
-                $queryBuilder->where('judul_foto', 'like', "%{$query}%")
-                            ->orWhere('deskripsi_foto', 'like', "%{$query}%");
-            })
-            ->when($name, function ($queryBuilder) use ($name) {
-                $queryBuilder->whereHas('user', function ($userQuery) use ($name) {
-                    $userQuery->where('name', 'like', "%{$name}%");
-                });
-            })
-            ->get();
-
-            AktivitasUser::create([
-                'user_id' => Auth::id(),
-                'aktivitas' => "Melakukan Pencarian '{$query}'",
-            ]);
-
+        ->when($query, function ($queryBuilder) use ($query) {
+            $queryBuilder->where('judul_foto', 'like', "%{$query}%")
+                        ->orWhereHas('album', function ($albumQuery) use ($query) {
+                            $albumQuery->where('nama_album', 'like', "%{$query}%");
+                        })
+                        ->orWhereHas('user', function ($userQuery) use ($query) {
+                            $userQuery->whereHas('photos', function ($fotoQuery) use ($query) {
+                                $fotoQuery->where('name', 'like', "%{$query}%");
+                            });
+                        });
+        })
+        ->get();
+    
+        // Log the search activity
+        AktivitasUser::create([
+            'user_id' => Auth::id(),
+            'aktivitas' => "Melakukan Pencarian: query='{$query}', nama_album='{$namaAlbum}'",
+        ]);
+    
         // Pass the search results to the view
         return view('main.searchresult', ['results' => $results]);
     }
-
-
+    
 
     /**
      * Display the specified resource.

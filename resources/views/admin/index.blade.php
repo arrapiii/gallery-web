@@ -44,6 +44,7 @@
                             <th class="text-center whitespace-nowrap">Image</th>
                             <th class="text-center whitespace-nowrap">Owner Image</th>
                             <th class="text-center whitespace-nowrap">Count Reported</th>
+                            <th class="text-center whitespace-nowrap">Show</th>
                             <th class="text-center whitespace-nowrap" data-orderable="false">Action</th>
                         </tr>
                     </thead>
@@ -66,6 +67,19 @@
                                 <td class="text-center whitespace-nowrap">
                                     <!-- Display count of reports for reported photo -->
                                     {{ $fotoReportCounts[$reportedPhoto->foto_id] ?? 0 }}
+                                </td>
+                                <td class="whitespace-nowrap text-center">
+                                    <div class="flex justify-center items-center">
+                                        <a href="javascript:;" class="mr-3 flex items-center text-warning detail-division-modal-search"
+                                            data-tw-toggle="modal"
+                                            data-tw-target="#detail-division-modal"
+                                            data-report-id="{{ $reportedPhoto }}"
+                                            data-reporter-name="{{ $reportedPhoto->user->name }}"
+                                            data-report-type="{{ $reportedPhoto->jenisLaporan->name }}"
+                                            data-photo-id="{{ $reportedPhoto->foto_id }}">
+                                            <i data-lucide="eye" class="w-4 h-4 mr-1"></i> Detail
+                                        </a>
+                                    </div>
                                 </td>
                                 <td class="text-center whitespace-nowrap">
                                     <div class="flex justify-center items-center">
@@ -139,6 +153,38 @@
         </div>
         <!-- END: Delete Confirmation Modal -->
     </div>  
+
+    <!-- Detail Modal -->
+<div id="detail-division-modal" class="modal" data-tw-toggle="modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Report</h5>
+                <button type="button" class="btn-close" data-tw-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name of Reporter</th>
+                            <th>Type of Report</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through the reported photos and display the details -->
+                        @foreach($uniqueLaporanFotos as $reportedPhoto)
+                        <tr>
+                            <td id="reporter-name">{{ $reportedPhoto->user->name }}</td>
+                            <td id="report-type">{{ $reportedPhoto->jenisLaporan->jenis_laporan }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- END: Content -->
     <script type="text/javascript">
          // data table
@@ -155,6 +201,48 @@
                 dataTable.search($(this).val()).draw();
             });
 
+             document.addEventListener('DOMContentLoaded', function() {
+                const modal = document.getElementById('detail-division-modal');
+                const reporterNameElement = modal.querySelector('#reporter-name');
+                const reportTypeElement = modal.querySelector('#report-type');
+
+                modal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const reporterName = button.getAttribute('data-reporter-name');
+                    const reportType = button.getAttribute('data-report-type');
+                    const photoId = button.getAttribute('data-photo-id'); // Get the photo ID
+
+                    // Update the content of the modal with the reporter's information for the specific photo
+                    reporterNameElement.textContent = reporterName;
+                    reportTypeElement.textContent = reportType;
+
+                    // Filter out the reported photos for the specific photo ID
+                    const reporterRows = modal.querySelectorAll('.reporter-row');
+                    reporterRows.forEach(function(row) {
+                        if (row.getAttribute('data-photo-id') === photoId) {
+                            row.classList.remove('hidden'); // Show the row if it matches the photo ID
+                        } else {
+                            row.classList.add('hidden'); // Hide the row if it doesn't match the photo ID
+                        }
+                    });
+                });
+            });
+            function loadDetail(id) {
+            $.ajax({
+                url: '{{ route('admin.detail', ':id') }}'.replace(':id', id),
+                type: 'GET',
+                success: function(response) {
+                    console.log(response);
+                    // Handle the response data and update your page accordingly
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Handle errors if any
+                }
+            });
+        }
+
+                    
         });
     </script>
 @endsection

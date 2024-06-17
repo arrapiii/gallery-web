@@ -135,9 +135,11 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
     public function styles(Worksheet $sheet)
     {
         
-        // Determine the last row of the data collection
-        $lastRow = $this->rowCount + 4; // Add 3 to account for the header rows
-        // Set the header background color to blue and apply border
+            // Get the last row of the data collection
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $lastDataRow = $highestRow;
+
         $sheet->getStyle('B2:H4')->applyFromArray([
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -159,7 +161,7 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
         ]);
 
         // Apply styling from B5 to the last row of the data collection
-        $sheet->getStyle('B5:H' . $lastRow)->applyFromArray([
+        $sheet->getStyle('B5:H' . $lastDataRow)->applyFromArray([
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
             ],
@@ -199,7 +201,7 @@ class AlbumSheet implements FromCollection, WithHeadings, WithMapping, WithStyle
         $sheet->getStyle('A5:H' . ($this->rowCount + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A5:H' . ($this->rowCount + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-        $sheet->getStyle('B2:H' . $lastRow)->getAlignment()->setWrapText(true);
+        $sheet->getStyle('B2:H' . $lastDataRow)->getAlignment()->setWrapText(true);
     }
 
 }

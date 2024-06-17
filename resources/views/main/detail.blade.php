@@ -54,7 +54,7 @@
                         @endif
                         <!-- Report button (Edit) -->
                         @if(auth()->check() && auth()->user()->id === $foto->user_id)
-                        <button id="reportButton" class="bg-transparent border-none focus:outline-none ml-4">
+                        <button id="editButton" class="bg-transparent border-none focus:outline-none ml-4">
                             <div class="flex items-center rounded-lg border border-yellow-500 px-2 py-1">
                                 <i id="editIcon" class="fas fa-edit fa-lg text-yellow-500 mr-1"></i> <!-- Edit icon -->
                                 <span class="text-yellow-500"><a href="{{ route('edit.foto', $foto->id) }}">Edit</a>

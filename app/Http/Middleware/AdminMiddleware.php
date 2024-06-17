@@ -13,12 +13,12 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
-        if ($request->user() && $request->user()->role === 'admin') {
-            return $next($request);
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return redirect()->route('home')->with('error', 'You are not authorized to access this page.');
         }
 
-        return redirect()->route('home');
+        return $next($request);
     }
 }

@@ -16,6 +16,7 @@ class AutoLogout
      */
     public function handle(Request $request, Closure $next): Response
     {
+        
         if (Auth::check() && ($request->is('login') || $request->is('/'))) {
             Auth::logout();
         }

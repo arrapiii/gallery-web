@@ -23,7 +23,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 mt-28">
+<body class="mt-28">
     @include('layouts.header')
     
     <div class="container mx-auto px-4 mb-8">
@@ -39,7 +39,7 @@
                             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V2.5A1.5 1.5 0 0010.5 1h-1A1.5 1.5 0 008 2.5V4a8 8 0 014 6.928V11h2.086a1.5 1.5 0 00.97-2.622l-8-7a1.5 1.5 0 00-2.112 2.122L12.086 9H10a10 10 0 00-6.598 17.67 1 1 0 00.11-.914l.57-2.068a1.5 1.5 0 00-2.296-1.268l-.75.54A12.001 12.001 0 004 12z"></path>
-                            </svg> Edit
+                            </svg> Upload
                         </button>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         </select> 
                     @else
                         <!-- Display this select if the user has albums -->
-                        <label for="album_id" class="form-label">Pilih Album (Optional)</label>
+                        <label for="album_id" class="form-label">Pilih Album</label>
                         <select id="album_id" name="album_id" data-placeholder="Pilih Album" class="tom-select w-full"> 
                             @foreach ($albums as $album)
                                 <option value=""></option>

@@ -9,7 +9,7 @@
         Report Log Activity
     </button>
     </form>
-    <form action="{{ route('profile.edit') }}" method="POST">
+    <form action="{{ route('profile.edit') }}">
       @csrf
       <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
         Edit Profil
@@ -54,9 +54,15 @@
   </div>
 
   <div class="text-center mt-12 mb-4">
-    <h1 class="text-2xl font-bold">Album Kamu</h1> 
+    <h1 class="text-2xl font-bold">Album & Foto</h1> 
+    <div class="mt-4">
+        <button id="albumButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md mr-4">Album Kamu</button>
+        <button id="likedPhotoButton" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md">Foto yang disukai</button>
+    </div>
   </div>
 
+<!-- Display user albums by default -->
+<div id="albumSection">
   <div class="grid grid-cols-3 gap-4 mt-8">
     @if($albums->isEmpty())
         <div class="col-span-3 flex justify-center">
@@ -104,9 +110,95 @@
         @endforeach
     @endif
 </div>
+</div>
+
+
+<div id="likedPhotoSection" class="hidden">
+    <div class="grid grid-cols-3 gap-5">
+    @foreach ($likedPhotos as $photo)
+    <div class="relative group h-64"> <!-- Set a fixed height for the container -->
+        <a href="{{ route('detail', ['foto_id' => $photo->id]) }}">
+            <img src="{{ asset('storage/' . $photo->lokasi_file) }}" alt="" class="w-full h-full object-cover rounded-lg" /> <!-- Use object-cover to fit the image within the container -->
+            <div class="flex justify-center items-center opacity-0 bg-gradient-to-t from-gray-800 via-gray-800 to-opacity-30 group-hover:opacity-50 absolute top-0 left-0 h-full w-full rounded-lg"></div>
+            <div class="absolute top-0 left-0 w-full h-full flex justify-center items-center opacity-0 hover:opacity-100">
+                <div class="flex-row text-center">
+                    <h1 class="text-gray-50 font-bold text-lg">{{ $photo->judul_foto }}</h1>
+                    <p class="text-gray-200 font-medium text-sm break-words max-w-md">{{ $photo->deskripsi_foto }}</p>
+                    <small class="text-xs font-light text-gray-300">Foto by {{ $photo->user->name }}</small>
+                    <div class="absolute bottom-0 right-0 bg-gray-800 px-2 py-1 rounded-bl-lg opacity-80">
+                        <p class="text-xs text-gray-200">{{ $photo->created_at->diffForHumans() }}</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    @endforeach
+</div>
+
+</div>
+
 
 
 
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const albumButton = document.getElementById('albumButton');
+      const likedPhotoButton = document.getElementById('likedPhotoButton');
+      const albumSection = document.getElementById('albumSection');
+      const likedPhotoSection = document.getElementById('likedPhotoSection');
+
+      // Function to load user albums
+      function loadUserAlbums() {
+          // Make an AJAX request to fetch user albums
+          // Replace the sample code below with your actual implementation
+          fetch('/api/user/albums')
+              .then(response => response.json())
+              .then(data => {
+                  // Clear existing content
+                  albumSection.innerHTML = '';
+                  // Display each album
+                  data.forEach(album => {
+                      albumSection.innerHTML += `<div>${album.name}</div>`;
+                  });
+              })
+              .catch(error => console.error('Error loading albums:', error));
+      }
+
+      // Function to load liked photos
+      function loadLikedPhotos() {
+          // Make an AJAX request to fetch liked photos
+          // Replace the sample code below with your actual implementation
+          fetch('/api/user/liked-photos')
+              .then(response => response.json())
+              .then(data => {
+                  // Clear existing content
+                  likedPhotoSection.innerHTML = '';
+                  // Display each liked photo
+                  data.forEach(photo => {
+                      likedPhotoSection.innerHTML += `<div>${photo.name}</div>`;
+                  });
+              })
+              .catch(error => console.error('Error loading liked photos:', error));
+      }
+
+      // Load user albums by default
+      loadUserAlbums();
+
+      // Add event listener for album button click
+      albumButton.addEventListener('click', function() {
+          albumSection.classList.remove('hidden');
+          likedPhotoSection.classList.add('hidden');
+          loadUserAlbums();
+      });
+
+      // Add event listener for liked photo button click
+      likedPhotoButton.addEventListener('click', function() {
+          albumSection.classList.add('hidden');
+          likedPhotoSection.classList.remove('hidden');
+          loadLikedPhotos();
+      });
+  });
+</script>
 
 @endsection

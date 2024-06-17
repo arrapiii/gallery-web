@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Foto;
 use App\Models\User;
 use App\Models\Album;
+use App\Models\LikeFoto;
 use Laravel\Ui\Presets\Vue;
 use Illuminate\Http\Request;
 use App\Models\AktivitasUser;
@@ -26,8 +27,14 @@ class ProfileController extends Controller
         $totalLikes = $userPhotos->map(function ($photo) {
             return $photo->likes()->count();
         })->sum();
+
+        // Get the IDs of photos liked by the authenticated user
+        $likedPhotoIds = LikeFoto::where('user_id', auth()->id())->pluck('foto_id');
+
+        // Retrieve the photos with the IDs obtained
+        $likedPhotos = Foto::whereIn('id', $likedPhotoIds)->get();
   
-        return view('profile.index', ['albums' => $albums, 'totalLikes' => $totalLikes]);
+        return view('profile.index', ['albums' => $albums, 'totalLikes' => $totalLikes, 'likedPhotos' => $likedPhotos]);
     }
 
     public function viewProfile($userId)

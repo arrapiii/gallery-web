@@ -36,16 +36,18 @@ Route::prefix('avatar')->group(function() {
     Route::post('/remove', [AvatarController::class, 'remove'])->name('remove.avatar');
 });
 
+Route::prefix('admin')->group(function() {
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/arsip', [AdminController::class, 'arsip'])->name('admin.arsip');
+    Route::get('/detail/{id}', [AdminController::class, 'detail'])->name('admin.detail');
+    Route::post('/approve-photo', [AdminController::class, 'approvePhoto'])->name('photo.approve');
+    Route::post('/reject-photo', [AdminController::class, 'rejectPhoto'])->name('photo.reject');
+});
+
 Auth::routes();
-Route::middleware(['auth'])->group(function() {
+Route::middleware(['auth', 'admin'])->group(function() {
     Route::prefix('home')->group(function() {
         Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    });
-
-    Route::prefix('admin')->middleware('admin')->group(function() {
-        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-        Route::post('/approve-photo', [AdminController::class, 'approvePhoto'])->name('photo.approve');
-        Route::post('/reject-photo', [AdminController::class, 'rejectPhoto'])->name('photo.reject');
     });
 
     Route::prefix('gallery')->group(function () {

@@ -33,6 +33,16 @@ class AdminController extends Controller
         return view('admin.index', compact('uniqueLaporanFotos', 'fotoReportCounts'));
     }
 
+    public function detail($id)
+    {
+        // Fetch the detail data based on the provided photo_id
+        $detailData = LaporanFoto::where('foto_id', $id)->with('user', 'jenisLaporan')->get();
+
+        // Return the detail data as JSON response
+        return response()->json($detailData);
+    }
+
+
     public function approvePhoto(Request $request)
     {
         $request->validate([
@@ -65,6 +75,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Failed to approve photo');
         }
     }
+
+    
     
     
     // public function getDetailData($foto_id)
